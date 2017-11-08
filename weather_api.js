@@ -58,10 +58,23 @@ server.route({
         }
 
         const data = JSON.parse(body);
-        reply.view('weather', { 
-          result: data, 
-          no_result: response.statusCode == 200 ? false : true
-        });
+        
+        if(request.headers['user-agent'].indexOf('curl') !== -1){
+          var weather_info = {
+            description: data.weather[0].description,
+            temperature: data.main.temp,
+            humidity: data.main.humidity,
+            wind_speed: data.wind.speed,
+            name_of_city: data.name ? data.name : '-' 
+          }
+
+          reply(weather_info);
+        }else{
+          reply.view('weather', { 
+            result: data, 
+            no_result: response.statusCode == 200 ? false : true
+          });
+        }
       });
     }
 });
